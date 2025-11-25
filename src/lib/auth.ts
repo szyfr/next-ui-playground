@@ -48,7 +48,16 @@ export async function logout(): Promise<void> {
 /**
  * Get the currently authenticated user
  */
+let userPromise: Promise<User> | null = null;
 export async function getCurrentUser(): Promise<User> {
-  const response = await apiClient.get<User>("/api/user");
-  return response.data;
+  if (userPromise) {
+    return userPromise;
+  }
+  userPromise = apiClient
+    .get<User>("/api/user")
+    .then((response) => response.data)
+    .finally(() => {
+      userPromise = null;
+    });
+  return userPromise;
 }

@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 export function NavUser({
   user,
@@ -41,10 +42,10 @@ export function NavUser({
   const { logout } = useAuth();
   const router = useRouter();
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await logout();
     router.push("/login");
-  };
+  }, [logout, router]);
 
   return (
     <SidebarMenu>
