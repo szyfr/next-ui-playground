@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { useAuth } from "@/contexts/auth-context"
-import { useState, type FormEvent } from "react"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/auth-context";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
@@ -32,9 +32,9 @@ export function LoginForm({
     try {
       await login({ email, password });
       // Redirect to dashboard on successful login
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (err: any) {
-      setFormError(err.message || 'Login failed. Please try again.');
+      setFormError(err.message || "Login failed. Please try again.");
     }
   };
 
@@ -90,7 +90,7 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Logging in...' : 'Login'}
+                  {loading ? "Logging in..." : "Login"}
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
@@ -144,5 +144,5 @@ export function LoginForm({
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
-  )
+  );
 }
