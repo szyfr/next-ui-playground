@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/auth-context";
-import { useActionState } from "react";
+import { memo, useActionState } from "react";
 import { useRouter } from "next/navigation";
 
 interface LoginState {
@@ -20,7 +20,7 @@ interface LoginState {
   success: boolean;
 }
 
-export function LoginForm({
+export const LoginForm = memo(function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -158,4 +158,4 @@ export function LoginForm({
       </FieldDescription>
     </div>
   );
-}
+});

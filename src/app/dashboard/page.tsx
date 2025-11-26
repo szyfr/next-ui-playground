@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
@@ -14,6 +15,11 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ProtectedRoute } from "@/components/protected-route";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Your application dashboard",
+};
 
 export default function Page() {
   return (
