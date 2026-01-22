@@ -36,9 +36,11 @@ export const LoginForm = memo(function LoginForm({
 
     try {
       await login({ email, password });
-      router.push("/dashboard");
       return { success: true, error: null };
     } catch (err: any) {
+      if (err.name === 'NEXT_REDIRECT' || err.digest?.includes('NEXT_REDIRECT')) {
+        throw err;
+      }
       return {
         success: false,
         error: err.message || "Login failed. Please try again.",

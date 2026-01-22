@@ -9,10 +9,12 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 import {
-  login as loginService,
-  logout as logoutService,
-  getCurrentUser,
+  login as loginAction,
+  logout as logoutAction,
+} from "@/app/actions/auth";
+import {
   type User,
   type LoginCredentials,
 } from "@/lib/auth";
@@ -28,58 +30,59 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({ children, initialUser = null }: { children: ReactNode; initialUser?: User | null }) {
+  const [user, setUser] = useState<User | null>(initialUser);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  // Sync internal state with initialUser when it changes (e.g. after router.refresh())
+  useEffect(() => {
+    setUser(initialUser);
+  }, [initialUser]);
 
   const checkAuth = useCallback(async () => {
-    try {
-      setLoading(true);
-      const userData = await getCurrentUser();
-      setUser(userData);
-      setError(null);
-    } catch (err) {
-      setUser(null);
-      // Don't set error for initial auth check
-    } finally {
-      setLoading(false);
-    }
+    // Check auth is now primarily done via Server Components passing initialUser
+    // deeper re-verification can be done here if needed.
   }, []);
 
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       setLoading(true);
       setError(null);
-      const userData = await loginService(credentials);
-      setUser(userData);
+      const result = await loginAction(credentials);
+
+      if (result && 'error' in result) {
+        throw new Error(result.error);
+      }
+
+      router.refresh();
     } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message ||
-        "Login failed. Please check your credentials.";
+      if (err.name === 'NEXT_REDIRECT' || err.digest?.includes('NEXT_REDIRECT') || err.message === 'NEXT_REDIRECT') {
+        throw err;
+      }
+      const errorMessage = err.message || "Login failed. Please check your credentials.";
       setError(errorMessage);
       throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   const logout = useCallback(async () => {
     try {
       setLoading(true);
-      await logoutService();
+      await logoutAction();
       setUser(null);
       setError(null);
+      router.push("/login");
+      router.refresh();
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  }, [router]);
 
   const value = useMemo(
     () => ({ user, loading, error, login, logout, checkAuth }),

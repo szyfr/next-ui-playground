@@ -1,9 +1,11 @@
 import axios, { type AxiosError } from "axios";
 
+// Enable credentials and XSRF token handling globally
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
+
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
-  withXSRFToken: true,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
