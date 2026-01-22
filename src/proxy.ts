@@ -11,11 +11,7 @@ export function proxy(request: NextRequest) {
     const hasSession = request.cookies.has("laravel-session") || request.cookies.has("laravel_session");
 
     if (process.env.NODE_ENV === "development") {
-        const cookiesCount = request.cookies.getAll().length;
-        console.log(`[Proxy] ${path} check - hasSession: ${hasSession}, Cookies: ${cookiesCount}`);
-        if (hasSession) {
-            console.log(`[Proxy] laravel-session present: ${request.cookies.get("laravel-session")?.value.substring(0, 10)}...`);
-        }
+        console.log(`[Proxy] ${path} - session: ${hasSession}`);
     }
 
     // 1. Protect private routes

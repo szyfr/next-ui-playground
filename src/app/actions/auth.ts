@@ -83,20 +83,30 @@ export async function login(credentials: LoginCredentials) {
 
 export async function logout() {
     const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get(COOKIE_NAME);
+
+    if (!sessionCookie) {
+        return { success: true };
+    }
 
     try {
         const token = cookieStore.get(XSRF_TOKEN)?.value;
         const decodedToken = token ? decodeURIComponent(token) : undefined;
 
-        await apiClient.post("/logout", {}, {
-            headers: {
-                Cookie: getCookieString(cookieStore),
-                "X-XSRF-TOKEN": decodedToken
-            }
-        });
+        const headers: Record<string, string> = {
+            Cookie: getCookieString(cookieStore),
+        };
+
+        if (decodedToken) {
+            headers["X-XSRF-TOKEN"] = decodedToken;
+        }
+
+        await apiClient.post("/logout", {}, { headers });
     } catch (e) {
-        // Ignore logout errors
-        console.error("Logout failed", e);
+        // 401 or 419 on logout is fine, it means we are already logged out
+        if (process.env.NODE_ENV === "development") {
+            console.info("[Auth Action] Logout API call finished (may have already been logged out)");
+        }
     }
 
     // Clear cookies

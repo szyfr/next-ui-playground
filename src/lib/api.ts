@@ -16,15 +16,17 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    // Log errors for debugging
-    if (process.env.NODE_ENV === "development") {
+    // Log errors for debugging (ignore 401 as it's a valid state)
+    if (process.env.NODE_ENV === "development" && error.response?.status !== 401) {
       console.error("API Error:", error.response?.data || error.message);
     }
 
     // Handle specific error cases
     if (error.response?.status === 401) {
-      // Unauthorized - could trigger logout or redirect
-      console.warn("Unauthorized request");
+      // 401 is a valid state (unauthenticated)
+      if (process.env.NODE_ENV === "development") {
+        console.info("[API] Unauthenticated (401)");
+      }
     }
 
     if (error.response?.status === 419) {
